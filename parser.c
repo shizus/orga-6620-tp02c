@@ -4,12 +4,13 @@
 #include <ctype.h>
 #include "parser.h"
 
+// Devuelve null si no hay memoria
 char* append(char* original, char* toAppend) {
 	if (original == NULL) {
 		original = malloc(sizeof(toAppend));
 	}	
 	if (original == NULL) {
-		printf("out of memory\n");
+		//printf("out of memory\n");
 		return NULL;
 	}
 	original = (char *) realloc(original, sizeof(toAppend));

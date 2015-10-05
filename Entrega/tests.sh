@@ -2,7 +2,7 @@
 
 TEST=(	
 		"success_normal"		#1
-		"sucess_espacios"		#2
+		"success_espacios"		#2
 		"error_dimension"		#3
 		"error_max_dimension"	#4
 		"error_max_line"		#5
@@ -10,7 +10,7 @@ TEST=(
 		"error_matriz2"			#7
 	)	
 		
-TESTDIR=./Tests
+TESTDIR=Tests
 
 touch tmp_out
 touch tmp_error

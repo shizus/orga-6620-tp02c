@@ -59,6 +59,20 @@ void imprimirMatriz(double** matriz, int filas, int columnas) {
 	printf("\n");
 }
 
+// Devuelve null sino hay memoria
+char* append(char* original, char* toAppend) {
+	if (original == NULL) {
+		original = malloc(sizeof(toAppend));
+	}	
+	if (original == NULL) {
+		printf("out of memory\n");
+		return NULL;
+	}
+	original = (char *) realloc(original, sizeof(toAppend));
+   	strcat(original, toAppend);
+	return original;
+}
+
 
 void leerDimension(int* filas, int* columnas) {
 	char c;
@@ -79,12 +93,16 @@ void leerDimension(int* filas, int* columnas) {
 		}
 
 		if(total >= MAX_DIMENSION_LENGTH) {
-			fprintf(stderr, "%s\n", "Tamano de buffer superado para la dimension.");
-			free(buffer);
-			exit(EXIT_ERROR);
+			char* oldBuffer = buffer;
+			buffer = append(buffer,&c);
+			if (buffer == NULL) {
+				free(oldBuffer);
+				fprintf(stderr, "%s\n", "No hay más memoria.");
+				exit(EXIT_ERROR);
+			}
+		} else {
+			buffer[i] = c;				
 		}
-
-		buffer[i] = c;
 		i++;
 		total++;
 	}
@@ -132,8 +150,12 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 		}
 
 		if(total >= MAX_LINE_LENGTH) {
-			fprintf(stderr, "%s\n", "Tamano de buffer superado para la matriz.");
-			free(buffer);
+			char* oldBuffer = buffer;
+			buffer = append(buffer,&c);
+			if (buffer == NULL) {
+				free(oldBuffer);
+				fprintf(stderr, "%s\n", "No hay más memoria para guardar la matriz.");
+			}
 			exit(EXIT_ERROR);
 		}
 
