@@ -60,26 +60,32 @@ void imprimirMatriz(double** matriz, int filas, int columnas) {
 }
 
 // Devuelve null sino hay memoria
-char* append(char* original, char* toAppend) {
+char* append(char* original, int originalSize, char* toAppend) {
 	if (original == NULL) {
 		original = malloc(sizeof(toAppend));
 	}	
 	if (original == NULL) {
+		//printf("out of memory\n");
+		return NULL;
+	}
+	original = (char *) realloc(original, (originalSize + 1) * sizeof(char));
+	if (original == NULL) {
 		printf("out of memory\n");
 		return NULL;
 	}
-	original = (char *) realloc(original, sizeof(toAppend));
-   	strcat(original, toAppend);
+	original[originalSize] = *toAppend;
 	return original;
 }
 
 
 void leerDimension(int* filas, int* columnas) {
+	int newChar;
 	char c;
-	char* buffer = (char *) malloc(sizeof(char) * MAX_DIMENSION_LENGTH);
+	char* buffer = (char *) malloc(sizeof(char) *  MAX_DIMENSION_LENGTH);
 	int i = 0, total = 0;
-	while((c = fgetc(stdin)) != EOF) {
-		
+	while((newChar = getchar()) != EOF) {
+		c = (char) newChar;
+		printf("c leído: %s\n", &c);
 		if (c == 'x') {
 			*filas = atoi(buffer);
 			memset(buffer,0,strlen(buffer));
@@ -94,31 +100,36 @@ void leerDimension(int* filas, int* columnas) {
 
 		if(total >= MAX_DIMENSION_LENGTH) {
 			char* oldBuffer = buffer;
-			buffer = append(buffer,&c);
+			buffer = append(buffer, total,&c);
 			if (buffer == NULL) {
 				free(oldBuffer);
-				fprintf(stderr, "%s\n", "No hay más memoria.");
+				fprintf(stderr, " No hay más memoria.\n");
 				exit(EXIT_ERROR);
 			}
-		} else {
-			buffer[i] = c;				
+		} else {			
+			buffer[i] = c;
+			//buffer[i]=strdup(&c);
 		}
 		i++;
 		total++;
 	}
 	free(buffer);
 
-	if (c == EOF)
+	if (newChar == EOF)
 		exit(EXIT_OK);
 }
 
 
 void leerMatriz(double** matriz, int filas, int columnas) {
+	int newChar;
 	char c;
 	char* buffer = (char *) malloc(sizeof(char) * MAX_LINE_LENGTH);
 	int i = 0, total = 0, elementos = 0, fila = 0, columna = 0;
-	while((c = fgetc(stdin)) != EOF) {
-		
+	while((newChar = fgetc(stdin)) != EOF) {
+		if (newChar == EOF) {
+			break;
+		}
+		c = (char) newChar;
 		total++;
 		
 		if (elementos >= filas * columnas) {
@@ -151,7 +162,7 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 
 		if(total >= MAX_LINE_LENGTH) {
 			char* oldBuffer = buffer;
-			buffer = append(buffer,&c);
+			buffer = append(buffer, total, &c);
 			if (buffer == NULL) {
 				free(oldBuffer);
 				fprintf(stderr, "%s\n", "No hay más memoria para guardar la matriz.");
@@ -170,7 +181,7 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 	}
 	
 
-	if (c == EOF)
+	if (newChar == EOF)
 		exit(EXIT_OK);
 }
 
