@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include "multiplicar.h"
 
 #define MAX_LINE_LENGTH 512
 #define MAX_DIMENSION_LENGTH 4
@@ -192,18 +193,7 @@ double** crearMatriz(int filas, int columnas) {
 	return matriz;
 }
 
-void multiplicarMatrices(double** matrizA, int filasA, int columnasA,
-		double** matrizB, int columnasB, double** resultado) {
-	int i, j, k;
-			for (i = 0; i < filasA; ++i){
-			  	for (j = 0 ; j < columnasB ; ++j){
-			  		resultado[i][j]=0;
-			      	for ( k = 0; k < columnasA; ++k){
-			      		resultado[i][j] = (resultado[i][j] + (matrizA[i][k] * matrizB[k][j]));
-			    	}
-				}
-			}
-}
+
 
 
 void multiplicarMatriz() {
