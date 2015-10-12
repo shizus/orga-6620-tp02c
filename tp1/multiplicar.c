@@ -1,5 +1,4 @@
-void multiplicarMatrices(double** matrizA, int filasA, int columnasA,
-		double** matrizB, int columnasB, double** resultado) {
+void muliplicarMatrices(int filasA, double** matrizB, double** resultado, double** matrizA, int columnasB, int columnasA) {
 	int i, j, k;
 			for (i = 0; i < filasA; ++i){
 			  	for (j = 0 ; j < columnasB ; ++j){

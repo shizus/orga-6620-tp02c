@@ -17,6 +17,7 @@ enum ACCION {
 	ERROR
 };
 
+void muliplicarMatrices(int filasA, double* matrizB, double* resultado, double* matrizA, int columnasB, int columnasA);
 void multiplicarMatriz();
 enum ACCION procesarArgumentos(int argc, char** argv);
 
@@ -228,10 +229,11 @@ void multiplicarMatriz() {
 		}
 
 		double** matrizC = crearMatriz(filasA, columnasB);
-		multiplicarMatrices(matrizA, filasA, columnasA, matrizB,
-				columnasB, matrizC);
+		
+		multiplicarMatrices(filasA, matrixB, matrixC, matrixA, 
+		 columnasB, columnasA);
 
-		imprimirMatriz(matrizC, filasA, columnasB);
+		imprimirMatriz(matrizC, filasA, columnasB); // TODO cambiar esto por un método que imprima pensando en array
 
 		free(matrizA);
 		free(matrizB);

@@ -13,7 +13,7 @@
 		
 multiplicarMatrices:
 		
-	mv t0, a0 # lw t0, cantf_c_i
+	move t0, a0 # lw t0, cantf_c_i
 	lw t1,  16(sp)# lw t1, cantc_c_j
 	lw t2, 20(sp) # lw t2, cantc_a_k
 	
