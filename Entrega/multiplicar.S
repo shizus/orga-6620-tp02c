@@ -15,16 +15,20 @@
 multiplicarMatrices:
 		
 		lw t0, 16(sp) # t0 cant col B
-		lw t1, 20(sp) # t1 puntero a matriz C
-		mul a1, a1, 4 # 4 byts por fila
-		mul a2, a2, 4 # 4 bytes por columna
-		mul t0, t0, 4 # 4 bytes por columna
+		lw t1, 20(sp) # t1 puntero a matriz resultado
 		
 		li t2, 0 # inicializo t2 = i = 0
 loop_1:
 		li t3, 0 # inicializo t3 = j = 0
 loop_2:
-		li t1, 0 # inicializo en 0 (resultado[i][j]=0;)
+		# inicializo resultado[i][j] = 0
+		mul t7, t2, 4 # [i]
+		mul t9, t3, 4 # [j]
+		add t7, t7, t9 # [i][j]
+		add t7, t1, t7 # dirección de resultado[i][j]
+		
+		sw zero, 0(t7) # resultado[i][j] = 0;		
+		
 		li t4, 0 # inicializo t4 = k = 0
 		
 loop_3:	

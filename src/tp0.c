@@ -71,7 +71,7 @@ char* append(char* original, int originalSize, char* toAppend) {
 	}
 	original = (char *) realloc(original, (originalSize + 1) * sizeof(char));
 	if (original == NULL) {
-		printf("out of memory\n");
+		fprintf(stderr, " No hay más memoria.\n");
 		return NULL;
 	}
 	original[originalSize] = *toAppend;
@@ -86,7 +86,7 @@ void leerDimension(int* filas, int* columnas) {
 	int i = 0, total = 0;
 	while((newChar = getchar()) != EOF) {
 		c = (char) newChar;
-		printf("c leído: %s\n", &c);
+		//printf("c leído: %s\n", &c);
 		if (c == 'x') {
 			*filas = atoi(buffer);
 			memset(buffer,0,strlen(buffer));

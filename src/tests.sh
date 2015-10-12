@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 TEST=(	
 		"success_normal"		#1
