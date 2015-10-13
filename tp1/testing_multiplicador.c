@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 void multiplicarMatrices(int filasA, double* matrizB, double* resultado, double* matrizA, int columnasB, int columnasA);
 
@@ -18,4 +19,6 @@ int main(int argc, char **argv) {
       for (i = 0; i < 8; i++) {
       	printf("%f, ", matrixC[i]);
       }
+
+      return 0;
 }
