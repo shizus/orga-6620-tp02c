@@ -230,7 +230,7 @@ void multiplicarMatriz() {
 
 		double** matrizC = crearMatriz(filasA, columnasB);
 		
-		multiplicarMatrices(filasA, matrixB, matrixC, matrixA, 
+		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, 
 		 columnasB, columnasA);
 
 		imprimirMatriz(matrizC, filasA, columnasB); // TODO cambiar esto por un método que imprima pensando en array
