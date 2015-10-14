@@ -17,7 +17,7 @@ enum ACCION {
 	ERROR
 };
 
-void muliplicarMatrices(int filasA, double* matrizB, double* resultado, double* matrizA, int columnasB, int columnasA);
+//void muliplicarMatrices(int filasA, int* matrizB, int* resultado, int* matrizA, int columnasB, int columnasA);
 void multiplicarMatriz();
 enum ACCION procesarArgumentos(int argc, char** argv);
 
@@ -50,13 +50,11 @@ int main(int argc, char **argv) {
 }
 
 
-void imprimirMatriz(double** matriz, int filas, int columnas) {
+void imprimirMatriz(double* matriz, int filas, int columnas) {
 	printf("%dx%d ", filas, columnas);
-	int i, j;
-	for (i = 0; i < filas; ++i) {
-		for (j = 0; j < columnas; ++j) {
-			printf("%g ", matriz[i][j]);
-		}
+	int i;
+	for (i = 0; i < filas * columnas; i++) {
+			printf("%g ", matriz[i]);
 	}
 	printf("\n");
 }
@@ -122,7 +120,7 @@ void leerDimension(int* filas, int* columnas) {
 }
 
 
-void leerMatriz(double** matriz, int filas, int columnas) {
+void leerMatriz(double* matriz, int filas, int columnas) {
 	int newChar;
 	char c;
 	char* buffer = (char *) malloc(sizeof(char) * MAX_LINE_LENGTH);
@@ -146,7 +144,7 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 				continue;
 
 			elementos++;
-			matriz[fila][columna] = atof(buffer);
+			matriz[(fila*columnas)+columna] = atof(buffer);
 			memset(buffer,0,strlen(buffer));
 			i = 0;
 			if (columna >= columnas - 1) {
@@ -186,8 +184,8 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 	if (newChar == EOF)
 		exit(EXIT_OK);
 }
-
-
+double* crearMatriz(int filas, int columnas) {
+/*
 double** crearMatriz(int filas, int columnas) {
 	double** matriz = (double**) malloc(sizeof(double*) * filas);
 	if (matriz == NULL) {
@@ -201,7 +199,8 @@ double** crearMatriz(int filas, int columnas) {
 	if (matriz[i - 1] == NULL) {
 		fprintf(stderr, "%s\n", "Memoria insuficiente.");
 		exit(EXIT_ERROR);
-	}
+	}*/
+	double* matriz = (double*) malloc(sizeof(double) * filas * columnas);
 	return matriz;
 }
 
@@ -213,12 +212,12 @@ void multiplicarMatriz() {
 	while (1) {
 		int filasA, columnasA;
 		leerDimension(&filasA, &columnasA);
-		double** matrizA = crearMatriz(filasA, columnasA);
+		double* matrizA = crearMatriz(filasA, columnasA);
 		leerMatriz(matrizA, filasA, columnasA);
 
 		int filasB, columnasB;
 		leerDimension(&filasB, &columnasB);
-		double** matrizB = crearMatriz(filasB, columnasB);
+		double* matrizB = crearMatriz(filasB, columnasB);
 		leerMatriz(matrizB, filasB, columnasB);
 
 		if (columnasA != filasB) {
@@ -228,10 +227,11 @@ void multiplicarMatriz() {
 			exit(EXIT_ERROR);
 		}
 
-		double** matrizC = crearMatriz(filasA, columnasB);
+		double* matrizC = crearMatriz(filasA, columnasB);
 		
 		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, 
 		 columnasB, columnasA);
+		 
 
 		imprimirMatriz(matrizC, filasA, columnasB); // TODO cambiar esto por un método que imprima pensando en array
 
