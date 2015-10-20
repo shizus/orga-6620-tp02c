@@ -97,6 +97,12 @@ void leerDimension(int* filas, int* columnas) {
 			break;
 		}
 
+		if (c != '\n' && (c < '0' || c > '9')) {
+			free(buffer);
+			fprintf(stderr, "Dimension incorrecta.\n");
+			exit(EXIT_ERROR);
+		}
+
 		if(total >= MAX_DIMENSION_LENGTH) {
 			char* oldBuffer = buffer;
 			buffer = append(buffer, total,&c);
@@ -112,6 +118,11 @@ void leerDimension(int* filas, int* columnas) {
 		total++;
 	}
 	free(buffer);
+
+	if (*filas == 0 || *columnas == 0) {
+		fprintf(stderr, "Dimension incorrecta.\n");
+		exit(EXIT_ERROR);
+	}
 
 	if (newChar == EOF)
 		exit(EXIT_OK);
@@ -211,7 +222,8 @@ void multiplicarMatriz() {
 
 		double* matrizC = crearMatriz(filasA, columnasB);
 		
-		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, columnasB, columnasA);
+		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, 
+		 columnasB, columnasA);
 		
 		imprimirMatriz(matrizC, filasA, columnasB);
 
