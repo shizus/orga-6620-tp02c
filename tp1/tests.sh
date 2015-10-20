@@ -1,11 +1,13 @@
 
 
 TEST=(	
-		"success_normal"		#1
-		"success_espacios"		#2
-		"error_dimension"		#3
-		"error_matriz1"			#4
-		"error_matriz2"			#5
+		"success_normal"						#1
+		"success_espacios"						#2
+		"error_dimension"						#3
+		"error_dimension_caracter_invalido"		#4
+		"error_dimension_cero"					#5
+		"error_matriz1"							#6
+		"error_matriz2"							#7
 	)	
 		
 TESTDIR=Tests
