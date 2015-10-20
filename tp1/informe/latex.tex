@@ -23,13 +23,16 @@ escapeinside={\%*}{*)}          		% if you want to add a comment within your cod
 
 \begin{document}
 
-\title{Trabajo Pr\'actico nro.~0: Infraestructura b\'asica} 
+\title{Trabajo Pr\'actico nro.~1: assembly MIPS} 
 
-\author{	Matias Cerrotta, \textit{Padr\'on 89992} 		\\	\texttt{$matias.cerrotta@gmail.com$}	\\[2.5ex] 	
-		\normalsize{2do.~Cuatrimestre de 2015}		\\
-	        	\normalsize{66.20 Organizaci\'on de Computadoras  $-$ Pr\'actica Martes}	\\
-          	\normalsize{Facultad de Ingenier\'ia, Universidad de Buenos Aires.}			\\
-	}
+\author{	
+Luis Arancibia, \textit{Padr\'on XXXXX} 	\\	\texttt{$aran.com.ar@gmail.com$}	\\[2.5ex] 	
+Matias Cerrotta, \textit{Padr\'on 89992} 	\\	\texttt{$matias.cerrotta@gmail.com$} 		\\[2.5ex]
+Gabriel La Torre, \textit{Padr\'on XXXXX}	\\	\texttt{$latorregab@gmail.com$}			\\[2.5ex]
+\normalsize{2do.~Cuatrimestre de 2015}		\\
+\normalsize{66.20 Organizaci\'on de Computadoras  $-$ Pr\'actica Martes}	\\
+\normalsize{Facultad de Ingenier\'ia, Universidad de Buenos Aires.}			\\
+}
 
 \date{}
 \maketitle
@@ -37,9 +40,9 @@ escapeinside={\%*}{*)}          		% if you want to add a comment within your cod
 \pagebreak
 
 \begin{abstract}
-Este trabajo pr\'actico nro.~0 busca familiarizar a los alumnos con las herramientas de software que se usar\'an a lo largo de la cursada. Se implementar\'a un programa en C (y su correspondiente documentaci\'on) que resuelver\'a el problema piloto que se presentar\'a m\'as abajo. 
+Este trabajo pr\'actico nro.~1 busca familiarizar a los alumnos con el conjunto de instrucciones MIPS y el concepto de ABI, extendiendo un programa que resuelva el problema piloto que se presentar\'a m\'as abajo. 
 
-Se mostrar\'a el c\'odigo C y se obtendr\'a el c\'odigo Assembly generado por el compilador \textit{gcc}.
+Se mostrar\'a el c\'odigo C y el c\'odigo Assembly generado para la correcta resoluci\'on.
 
 El programa correr\'a tanto en NetBSD/pmax, usando el simulador GXemul provisto por la c\'atedra, como en la versi\'on de Linux (Knoppix, RedHat, Debian, Ubuntu) usada para correr el simulador, Linux/i386.
 
@@ -68,15 +71,22 @@ Su representaci\'on ser\'ia:
 Por cada par de matrices que se presenten en su entrada, el programa deber\'a multiplicarlas y presentar el resultado por su salida es\'andar (stdout) en el mismo formato presentado anteriormente, hasta que llegue al final del archivo de entrada (EOF). Ante un error, el progama
 deber\'a informar la situaci\'on inmediatamente (por stderr) y detener su ejecuci\'on. Tener en cuenta que tambi\'en se condidera un error que a la entrada se presenten matrices de dimensiones incompatibles entre s\'i para su multiplicaci\'on.
 
+
+
 \pagebreak
 
 
 \section{Documentaci\'on}
 
 \subsection{Compilaci\'on}
-El programa se compilar\'a con la siguiente instrucci\'on:
+El programa se compilar\'a con la siguiente instrucci\'on para utilizar la implementaci\'on en C:
 \begin{center} 
-\fbox{gcc -Wall -O0 -o tp0 tp0.c}
+\fbox{gcc -Wall -O0 -o tp1 tp1.c multiplicar.c}
+\end{center}
+
+Y con la siguiente instrucci\'on para la implementaci\'on en Assembly:
+\begin{center} 
+\fbox{gcc -Wall -O0 -o tp1 tp1.c multiplicar.S}
 \end{center}
 
 Los tests se ejecutar\'an con el siguiente script:
@@ -87,29 +97,29 @@ Los tests se ejecutar\'an con el siguiente script:
 Ejemplo de la salida de ejecuci\'on:
 \begin{verbatim}
 $ ./tests.sh
-	Tests #0 success_normal: 		OK
-	Tests #1 sucess_espacios: 		OK
-	Tests #2 error_dimension: 		OK
-	Tests #3 error_max_dimension: 	OK
-	Tests #4 error_max_line: 		OK
-	Tests #5 error_matriz1: 			OK
-	Tests #6 error_matriz2: 			OK
+	Tests #0 success_normal: 						OK
+	Tests #1 success_espacios: 						OK
+	Tests #2 error_dimension: 						OK
+	Tests #3 error_dimension_caracter_invalido: 	OK
+	Tests #4 error_dimension_cero: 					OK
+	Tests #5 error_matriz1: 						OK
+	Tests #6 error_matriz2: 						OK
 \end{verbatim}
 
 \subsection{Utilizaci\'on}
 Opciones de ejecuci\'on:
 \begin{verbatim}
 	-h, --help		Print this information.
-	-V, --version		Print version and quit.
+	-V, --version	Print version and quit.
 \end{verbatim}
 
 Ejemplos de ejecuci\'on:
 \begin{verbatim}
 Examples:
-	./tp0 -h
-	./tp0 -V
-	./tp0 < in_file > out_file
-	./tp0 < in.txt > out.txt
+	./tp1 -h
+	./tp1 -V
+	./tp1 < in_file > out_file
+	./tp1 < in.txt > out.txt
 	cat in.txt | tp0 > out.txt
 
 \end{verbatim}
@@ -135,9 +145,9 @@ Se crearon los siguientes casos de pruebas:
 \item Caso normal.	
 \item Utilizando espacios entre elementos de matriz.
 \item Dimensiones de matrices incompatibles.
-\item Superaci\'on de caracteres m\'aximos para dimensi\'on.
-\item Superaci\'on de caracteres m\'aximos para matriz.
-\item Elementos de m\'as con respecto a la dimensi\'on.
+\item Dimensiones de matrices con valores no alfanum\'ericos.
+\item Dimensiones de matrices con valores inv\'alidos.
+-\item Elementos de m\'as con respecto a la dimensi\'on.
 \item Elementos de menos con respecto a la dimensi\'on.
 \end{enumerate}				
 \pagebreak
@@ -150,6 +160,7 @@ Se crearon los siguientes casos de pruebas:
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include "multiplicar.h"
 
 #define MAX_LINE_LENGTH 512
 #define MAX_DIMENSION_LENGTH 4
@@ -195,23 +206,43 @@ int main(int argc, char **argv) {
 	return EXIT_OK;
 }
 
-void imprimirMatriz(double** matriz, int filas, int columnas) {
+
+void imprimirMatriz(double* matriz, int filas, int columnas) {
 	printf("%dx%d ", filas, columnas);
-	int i, j;
-	for (i = 0; i < filas; ++i) {
-		for (j = 0; j < columnas; ++j) {
-			printf("%g ", matriz[i][j]);
-		}
+	int i;
+	for (i = 0; i < filas * columnas; i++) {
+			printf("%g ", matriz[i]);
 	}
 	printf("\n");
 }
 
+// Devuelve null sino hay memoria
+char* append(char* original, int originalSize, char* toAppend) {
+	if (original == NULL) {
+		original = malloc(sizeof(toAppend));
+	}	
+	if (original == NULL) {
+		//printf("out of memory\n");
+		return NULL;
+	}
+	original = (char *) realloc(original, (originalSize + 1) * sizeof(char));
+	if (original == NULL) {
+		fprintf(stderr, " No hay más memoria.\n");
+		return NULL;
+	}
+	original[originalSize] = *toAppend;
+	return original;
+}
+
+
 void leerDimension(int* filas, int* columnas) {
+	int newChar;
 	char c;
-	char* buffer = (char *) malloc(sizeof(char) * MAX_DIMENSION_LENGTH);
+	char* buffer = (char *) malloc(sizeof(char) *  MAX_DIMENSION_LENGTH);
 	int i = 0, total = 0;
-	while((c = fgetc(stdin)) != EOF) {
-		
+	while((newChar = getchar()) != EOF) {
+		c = (char) newChar;
+
 		if (c == 'x') {
 			*filas = atoi(buffer);
 			memset(buffer,0,strlen(buffer));
@@ -224,28 +255,48 @@ void leerDimension(int* filas, int* columnas) {
 			break;
 		}
 
-		if(total >= MAX_DIMENSION_LENGTH) {
-			fprintf(stderr, "%s\n", "Tamano de buffer superado para la dimension.");
+		if (c != '\n' && (c < '0' || c > '9')) {
 			free(buffer);
+			fprintf(stderr, "Dimension incorrecta.\n");
 			exit(EXIT_ERROR);
 		}
 
-		buffer[i] = c;
+		if(total >= MAX_DIMENSION_LENGTH) {
+			char* oldBuffer = buffer;
+			buffer = append(buffer, total,&c);
+			if (buffer == NULL) {
+				free(oldBuffer);
+				fprintf(stderr, " No hay más memoria.\n");
+				exit(EXIT_ERROR);
+			}
+		} else {			
+			buffer[i] = c;
+		}
 		i++;
 		total++;
 	}
 	free(buffer);
 
-	if (c == EOF)
+	if (*filas == 0 || *columnas == 0) {
+		fprintf(stderr, "Dimension incorrecta.\n");
+		exit(EXIT_ERROR);
+	}
+
+	if (newChar == EOF)
 		exit(EXIT_OK);
 }
 
-void leerMatriz(double** matriz, int filas, int columnas) {
+
+void leerMatriz(double* matriz, int filas, int columnas) {
+	int newChar;
 	char c;
 	char* buffer = (char *) malloc(sizeof(char) * MAX_LINE_LENGTH);
 	int i = 0, total = 0, elementos = 0, fila = 0, columna = 0;
-	while((c = fgetc(stdin)) != EOF) {
-		
+	while((newChar = fgetc(stdin)) != EOF) {
+		if (newChar == EOF) {
+			break;
+		}
+		c = (char) newChar;
 		total++;
 		
 		if (elementos >= filas * columnas) {
@@ -260,7 +311,7 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 				continue;
 
 			elementos++;
-			matriz[fila][columna] = atof(buffer);
+			matriz[(fila*columnas)+columna] = atof(buffer);
 			memset(buffer,0,strlen(buffer));
 			i = 0;
 			if (columna >= columnas - 1) {
@@ -277,8 +328,12 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 		}
 
 		if(total >= MAX_LINE_LENGTH) {
-			fprintf(stderr, "%s\n", "Tamano de buffer superado para la matriz.");
-			free(buffer);
+			char* oldBuffer = buffer;
+			buffer = append(buffer, total, &c);
+			if (buffer == NULL) {
+				free(oldBuffer);
+				fprintf(stderr, "%s\n", "No hay más memoria para guardar la matriz.");
+			}
 			exit(EXIT_ERROR);
 		}
 
@@ -292,39 +347,28 @@ void leerMatriz(double** matriz, int filas, int columnas) {
 		exit(EXIT_ERROR);
 	}
 	
-
-	if (c == EOF)
+	if (newChar == EOF)
 		exit(EXIT_OK);
 }
 
-double** crearMatriz(int filas, int columnas) {
-	double** matriz = (double**) malloc(sizeof(double*) * filas);
-	if (matriz == NULL) {
-		fprintf(stderr, "%s\n", "Memoria insuficiente.");
-		exit(EXIT_ERROR);
-	}
-	int i;
-	for(i = 0; i < filas; ++i)
-		matriz[i] = (double*) malloc(sizeof(double) * columnas);
 
-	if (matriz[i - 1] == NULL) {
-		fprintf(stderr, "%s\n", "Memoria insuficiente.");
-		exit(EXIT_ERROR);
-	}
+double* crearMatriz(int filas, int columnas) {
+	double* matriz = (double*) malloc(sizeof(double) * filas * columnas);
 	return matriz;
 }
+
 
 void multiplicarMatriz() {
 	
 	while (1) {
 		int filasA, columnasA;
 		leerDimension(&filasA, &columnasA);
-		double** matrizA = crearMatriz(filasA, columnasA);
+		double* matrizA = crearMatriz(filasA, columnasA);
 		leerMatriz(matrizA, filasA, columnasA);
 
 		int filasB, columnasB;
 		leerDimension(&filasB, &columnasB);
-		double** matrizB = crearMatriz(filasB, columnasB);
+		double* matrizB = crearMatriz(filasB, columnasB);
 		leerMatriz(matrizB, filasB, columnasB);
 
 		if (columnasA != filasB) {
@@ -334,16 +378,11 @@ void multiplicarMatriz() {
 			exit(EXIT_ERROR);
 		}
 
-		double** matrizC = crearMatriz(filasA, columnasB);
-		int i, j, k;
-		for (i = 0; i < filasA; ++i){
-		  	for (j = 0 ; j < columnasB ; ++j){
-		      	matrizC[i][j]=0;
-		      	for ( k = 0; k < columnasA; ++k){
-		        	matrizC[i][j] = (matrizC[i][j] + (matrizA[i][k] * matrizB[k][j]));
-		    	}
-			}
-		}
+		double* matrizC = crearMatriz(filasA, columnasB);
+		
+		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, 
+		 columnasB, columnasA);
+		
 		imprimirMatriz(matrizC, filasA, columnasB);
 
 		free(matrizA);
@@ -351,6 +390,7 @@ void multiplicarMatriz() {
 		free(matrizC);
 	}
 }
+
 
 enum ACCION procesarArgumentos(int argc, char** argv) {
 	// valores por defecto
@@ -382,832 +422,101 @@ enum ACCION procesarArgumentos(int argc, char** argv) {
 }
 \end{lstlisting}
 \pagebreak
+\begin{lstlisting}
+void multiplicarMatrices(int filasA, double* matrizB, double* resultado, double* matrizA, int columnasB, int columnasA) {
+	int i, j, k;
+	for (i = 0; i < filasA; ++i) {
+	  	for (j = 0 ; j < columnasB ; ++j) {
+	  		resultado[i*columnasB+j]=0;
+	      	for ( k = 0; k < columnasA; ++k) {
+	      		resultado[i*columnasB+j] = (resultado[i*columnasB+j] + (matrizA[i*columnasA+k] * matrizB[k*columnasB+j]));
+	    	}
+		}
+	}
+}
+\end{lstlisting}
+\pagebreak
 
 
 \section{C\'odigo $MIPS^{TM}$}
 \begin{lstlisting}
-	.file	1 "tp0.c"
-	.section .mdebug.abi32
-	.previous
-	.abicalls
-	.rdata
-	.align	2
-$LC0:
-	.ascii	"Usage:\n"
-	.ascii	"\ttp0 -h\n"
-	.ascii	"\ttp0 -V\n"
-	.ascii	"\ttp0 < in_file > out_file\n"
-	.ascii	"Options:\n"
-	.ascii	"\t-V, --version\tPrint version and quit.\n"
-	.ascii	"\t-h, --help\tPrint this information.\n"
-	.ascii	"Examples:\n"
-	.ascii	"\ttp0 < in.txt > out.txt\n"
-	.ascii	"\tcat in.txt | tp0 > out.txt\n\000"
-	.align	2
-$LC1:
-	.ascii	"tp0 v0.1\n\000"
-	.text
-	.align	2
-	.globl	main
-	.ent	main
-main:
-	.frame	$fp,56,$ra		# vars= 16, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,56
-	.cprestore 16
-	sw	$ra,48($sp)
-	sw	$fp,44($sp)
-	sw	$gp,40($sp)
-	move	$fp,$sp
-	sw	$a0,56($fp)
-	sw	$a1,60($fp)
-	lw	$a0,56($fp)
-	lw	$a1,60($fp)
-	la	$t9,procesarArgumentos
-	jal	$ra,$t9
-	sw	$v0,24($fp)
-	lw	$v0,24($fp)
-	sw	$v0,32($fp)
-	li	$v0,2			# 0x2
-	lw	$v1,32($fp)
-	beq	$v1,$v0,$L20
-	lw	$v1,32($fp)
-	sltu	$v0,$v1,3
-	beq	$v0,$zero,$L25
-	li	$v0,1			# 0x1
-	lw	$v1,32($fp)
-	beq	$v1,$v0,$L19
-	b	$L23
-$L25:
-	li	$v0,3			# 0x3
-	lw	$v1,32($fp)
-	beq	$v1,$v0,$L21
-	b	$L23
-$L19:
-	la	$a0,$LC0
-	la	$t9,printf
-	jal	$ra,$t9
-	b	$L18
-$L20:
-	la	$a0,$LC1
-	la	$t9,printf
-	jal	$ra,$t9
-	b	$L18
-$L21:
-	la	$t9,multiplicarMatriz
-	jal	$ra,$t9
-	b	$L18
-$L23:
-	li	$v0,1			# 0x1
-	sw	$v0,28($fp)
-	b	$L17
-$L18:
-	sw	$zero,28($fp)
-$L17:
-	lw	$v0,28($fp)
-	move	$sp,$fp
-	lw	$ra,48($sp)
-	lw	$fp,44($sp)
-	addu	$sp,$sp,56
-	j	$ra
-	.end	main
-	.size	main, .-main
-	.rdata
-	.align	2
-$LC2:
-	.ascii	"%dx%d \000"
-	.align	2
-$LC3:
-	.ascii	"%g \000"
-	.align	2
-$LC4:
-	.ascii	"\n\000"
-	.text
-	.align	2
-	.globl	imprimirMatriz
-	.ent	imprimirMatriz
-imprimirMatriz:
-	.frame	$fp,48,$ra		# vars= 8, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,48
-	.cprestore 16
-	sw	$ra,40($sp)
-	sw	$fp,36($sp)
-	sw	$gp,32($sp)
-	move	$fp,$sp
-	sw	$a0,48($fp)
-	sw	$a1,52($fp)
-	sw	$a2,56($fp)
-	la	$a0,$LC2
-	lw	$a1,52($fp)
-	lw	$a2,56($fp)
-	la	$t9,printf
-	jal	$ra,$t9
-	sw	$zero,24($fp)
-$L27:
-	lw	$v0,24($fp)
-	lw	$v1,52($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L30
-	b	$L28
-$L30:
-	sw	$zero,28($fp)
-$L31:
-	lw	$v0,28($fp)
-	lw	$v1,56($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L34
-	b	$L29
-$L34:
-	lw	$v0,24($fp)
-	sll	$v1,$v0,2
-	lw	$v0,48($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,28($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$v0,$v1,$v0
-	la	$a0,$LC3
-	lw	$a2,0($v0)
-	lw	$a3,4($v0)
-	la	$t9,printf
-	jal	$ra,$t9
-	lw	$v0,28($fp)
-	addu	$v0,$v0,1
-	sw	$v0,28($fp)
-	b	$L31
-$L29:
-	lw	$v0,24($fp)
-	addu	$v0,$v0,1
-	sw	$v0,24($fp)
-	b	$L27
-$L28:
-	la	$a0,$LC4
-	la	$t9,printf
-	jal	$ra,$t9
-	move	$sp,$fp
-	lw	$ra,40($sp)
-	lw	$fp,36($sp)
-	addu	$sp,$sp,48
-	j	$ra
-	.end	imprimirMatriz
-	.size	imprimirMatriz, .-imprimirMatriz
-	.rdata
-	.align	2
-$LC5:
-	.ascii	"%s\n\000"
-	.align	2
-$LC6:
-	.ascii	"Tamano de buffer superado para la dimension.\000"
-	.text
-	.align	2
-	.globl	leerDimension
-	.ent	leerDimension
-leerDimension:
-	.frame	$fp,56,$ra		# vars= 16, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,56
-	.cprestore 16
-	sw	$ra,48($sp)
-	sw	$fp,44($sp)
-	sw	$gp,40($sp)
-	move	$fp,$sp
-	sw	$a0,56($fp)
-	sw	$a1,60($fp)
-	li	$a0,4			# 0x4
-	la	$t9,malloc
-	jal	$ra,$t9
-	sw	$v0,28($fp)
-	sw	$zero,32($fp)
-	sw	$zero,36($fp)
-$L36:
-	la	$a0,__sF
-	la	$t9,fgetc
-	jal	$ra,$t9
-	sb	$v0,24($fp)
-	lbu	$v0,24($fp)
-	sll	$v0,$v0,24
-	sra	$v1,$v0,24
-	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L38
-	b	$L37
-$L38:
-	lb	$v1,24($fp)
-	li	$v0,120			# 0x78
-	bne	$v1,$v0,$L39
-	lw	$a0,28($fp)
-	la	$t9,atoi
-	jal	$ra,$t9
-	lw	$v1,56($fp)
-	sw	$v0,0($v1)
-	lw	$a0,28($fp)
-	la	$t9,strlen
-	jal	$ra,$t9
-	lw	$a0,28($fp)
-	move	$a1,$zero
-	move	$a2,$v0
-	la	$t9,memset
-	jal	$ra,$t9
-	sw	$zero,32($fp)
-	b	$L36
-$L39:
-	lb	$v1,24($fp)
-	li	$v0,32			# 0x20
-	bne	$v1,$v0,$L40
-	lw	$a0,28($fp)
-	la	$t9,atoi
-	jal	$ra,$t9
-	move	$v1,$v0
-	lw	$v0,60($fp)
-	sw	$v1,0($v0)
-	b	$L37
-$L40:
-	lw	$v0,36($fp)
-	slt	$v0,$v0,4
-	bne	$v0,$zero,$L41
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC6
-	la	$t9,fprintf
-	jal	$ra,$t9
-	lw	$a0,28($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L41:
-	lw	$v1,28($fp)
-	lw	$v0,32($fp)
-	addu	$v1,$v1,$v0
-	lbu	$v0,24($fp)
-	sb	$v0,0($v1)
-	lw	$v0,32($fp)
-	addu	$v0,$v0,1
-	sw	$v0,32($fp)
-	lw	$v0,36($fp)
-	addu	$v0,$v0,1
-	sw	$v0,36($fp)
-	b	$L36
-$L37:
-	lw	$a0,28($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	lb	$v1,24($fp)
-	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L35
-	move	$a0,$zero
-	la	$t9,exit
-	jal	$ra,$t9
-$L35:
-	move	$sp,$fp
-	lw	$ra,48($sp)
-	lw	$fp,44($sp)
-	addu	$sp,$sp,56
-	j	$ra
-	.end	leerDimension
-	.size	leerDimension, .-leerDimension
-	.rdata
-	.align	2
-$LC7:
-	.ascii	"Dimension no compatible con datos de matriz.\000"
-	.align	2
-$LC8:
-	.ascii	"Tamano de buffer superado para la matriz.\000"
-	.text
-	.align	2
-	.globl	leerMatriz
-	.ent	leerMatriz
-leerMatriz:
-	.frame	$fp,72,$ra		# vars= 32, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,72
-	.cprestore 16
-	sw	$ra,64($sp)
-	sw	$fp,60($sp)
-	sw	$gp,56($sp)
-	move	$fp,$sp
-	sw	$a0,72($fp)
-	sw	$a1,76($fp)
-	sw	$a2,80($fp)
-	li	$a0,512			# 0x200
-	la	$t9,malloc
-	jal	$ra,$t9
-	sw	$v0,28($fp)
-	sw	$zero,32($fp)
-	sw	$zero,36($fp)
-	sw	$zero,40($fp)
-	sw	$zero,44($fp)
-	sw	$zero,48($fp)
-$L44:
-	la	$a0,__sF
-	la	$t9,fgetc
-	jal	$ra,$t9
-	sb	$v0,24($fp)
-	lbu	$v0,24($fp)
-	sll	$v0,$v0,24
-	sra	$v1,$v0,24
-	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L46
-	b	$L45
-$L46:
-	lw	$v0,36($fp)
-	addu	$v0,$v0,1
-	sw	$v0,36($fp)
-	lw	$v1,76($fp)
-	lw	$v0,80($fp)
-	mult	$v1,$v0
-	mflo	$v1
-	lw	$v0,40($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L47
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC7
-	la	$t9,fprintf
-	jal	$ra,$t9
-	lw	$a0,28($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L47:
-	lb	$v1,24($fp)
-	li	$v0,32			# 0x20
-	beq	$v1,$v0,$L49
-	lb	$v1,24($fp)
-	li	$v0,10			# 0xa
-	beq	$v1,$v0,$L49
-	b	$L48
-$L49:
-	lw	$v0,28($fp)
-	lb	$v0,0($v0)
-	bne	$v0,$zero,$L50
-	b	$L44
-$L50:
-	lw	$v0,40($fp)
-	addu	$v0,$v0,1
-	sw	$v0,40($fp)
-	lw	$a0,28($fp)
-	la	$t9,atof
-	jal	$ra,$t9
-	lw	$v0,44($fp)
-	sll	$v1,$v0,2
-	lw	$v0,72($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,48($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$v0,$v1,$v0
-	s.d	$f0,0($v0)
-	lw	$a0,28($fp)
-	la	$t9,strlen
-	jal	$ra,$t9
-	lw	$a0,28($fp)
-	move	$a1,$zero
-	move	$a2,$v0
-	la	$t9,memset
-	jal	$ra,$t9
-	sw	$zero,32($fp)
-	lw	$v0,80($fp)
-	addu	$v1,$v0,-1
-	lw	$v0,48($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L51
-	lw	$v0,44($fp)
-	addu	$v0,$v0,1
-	sw	$v0,44($fp)
-	sw	$zero,48($fp)
-	b	$L52
-$L51:
-	lw	$v0,48($fp)
-	addu	$v0,$v0,1
-	sw	$v0,48($fp)
-$L52:
-	lb	$v1,24($fp)
-	li	$v0,10			# 0xa
-	bne	$v1,$v0,$L44
-	b	$L45
-$L48:
-	lw	$v0,36($fp)
-	slt	$v0,$v0,512
-	bne	$v0,$zero,$L54
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC8
-	la	$t9,fprintf
-	jal	$ra,$t9
-	lw	$a0,28($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L54:
-	lw	$v1,28($fp)
-	lw	$v0,32($fp)
-	addu	$v1,$v1,$v0
-	lbu	$v0,24($fp)
-	sb	$v0,0($v1)
-	lw	$v0,32($fp)
-	addu	$v0,$v0,1
-	sw	$v0,32($fp)
-	b	$L44
-$L45:
-	lw	$a0,28($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	lw	$v1,76($fp)
-	lw	$v0,80($fp)
-	mult	$v1,$v0
-	mflo	$v1
-	lw	$v0,40($fp)
-	slt	$v0,$v0,$v1
-	beq	$v0,$zero,$L55
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC7
-	la	$t9,fprintf
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L55:
-	lb	$v1,24($fp)
-	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L43
-	move	$a0,$zero
-	la	$t9,exit
-	jal	$ra,$t9
-$L43:
-	move	$sp,$fp
-	lw	$ra,64($sp)
-	lw	$fp,60($sp)
-	addu	$sp,$sp,72
-	j	$ra
-	.end	leerMatriz
-	.size	leerMatriz, .-leerMatriz
-	.rdata
-	.align	2
-$LC9:
-	.ascii	"Memoria insuficiente.\000"
-	.text
-	.align	2
-	.globl	crearMatriz
-	.ent	crearMatriz
-crearMatriz:
-	.frame	$fp,48,$ra		# vars= 8, regs= 4/0, args= 16, extra= 8
-	.mask	0xd0010000,-4
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,48
-	.cprestore 16
-	sw	$ra,44($sp)
-	sw	$fp,40($sp)
-	sw	$gp,36($sp)
-	sw	$s0,32($sp)
-	move	$fp,$sp
-	sw	$a0,48($fp)
-	sw	$a1,52($fp)
-	lw	$v0,48($fp)
-	sll	$v0,$v0,2
-	move	$a0,$v0
-	la	$t9,malloc
-	jal	$ra,$t9
-	sw	$v0,24($fp)
-	lw	$v0,24($fp)
-	bne	$v0,$zero,$L58
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC9
-	la	$t9,fprintf
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L58:
-	sw	$zero,28($fp)
-$L59:
-	lw	$v0,28($fp)
-	lw	$v1,48($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L62
-	b	$L60
-$L62:
-	lw	$v0,28($fp)
-	sll	$v1,$v0,2
-	lw	$v0,24($fp)
-	addu	$s0,$v1,$v0
-	lw	$v0,52($fp)
-	sll	$v0,$v0,3
-	move	$a0,$v0
-	la	$t9,malloc
-	jal	$ra,$t9
-	sw	$v0,0($s0)
-	lw	$v0,28($fp)
-	addu	$v0,$v0,1
-	sw	$v0,28($fp)
-	b	$L59
-$L60:
-	lw	$v0,28($fp)
-	sll	$v1,$v0,2
-	lw	$v0,24($fp)
-	addu	$v0,$v1,$v0
-	addu	$v0,$v0,-4
-	lw	$v0,0($v0)
-	bne	$v0,$zero,$L63
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC9
-	la	$t9,fprintf
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L63:
-	lw	$v0,24($fp)
-	move	$sp,$fp
-	lw	$ra,44($sp)
-	lw	$fp,40($sp)
-	lw	$s0,32($sp)
-	addu	$sp,$sp,48
-	j	$ra
-	.end	crearMatriz
-	.size	crearMatriz, .-crearMatriz
-	.rdata
-	.align	2
-$LC10:
-	.ascii	"Dimensiones incorrectas de matrices.\000"
-	.text
-	.align	2
-	.globl	multiplicarMatriz
-	.ent	multiplicarMatriz
-multiplicarMatriz:
-	.frame	$fp,80,$ra		# vars= 40, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,80
-	.cprestore 16
-	sw	$ra,72($sp)
-	sw	$fp,68($sp)
-	sw	$gp,64($sp)
-	move	$fp,$sp
-	.set	noreorder
-	nop
-	.set	reorder
-$L65:
-	addu	$v0,$fp,28
-	addu	$a0,$fp,24
-	move	$a1,$v0
-	la	$t9,leerDimension
-	jal	$ra,$t9
-	lw	$a0,24($fp)
-	lw	$a1,28($fp)
-	la	$t9,crearMatriz
-	jal	$ra,$t9
-	sw	$v0,32($fp)
-	lw	$a0,32($fp)
-	lw	$a1,24($fp)
-	lw	$a2,28($fp)
-	la	$t9,leerMatriz
-	jal	$ra,$t9
-	addu	$v0,$fp,36
-	addu	$v1,$fp,40
-	move	$a0,$v0
-	move	$a1,$v1
-	la	$t9,leerDimension
-	jal	$ra,$t9
-	lw	$a0,36($fp)
-	lw	$a1,40($fp)
-	la	$t9,crearMatriz
-	jal	$ra,$t9
-	sw	$v0,44($fp)
-	lw	$a0,44($fp)
-	lw	$a1,36($fp)
-	lw	$a2,40($fp)
-	la	$t9,leerMatriz
-	jal	$ra,$t9
-	lw	$v1,28($fp)
-	lw	$v0,36($fp)
-	beq	$v1,$v0,$L68
-	la	$a0,__sF+176
-	la	$a1,$LC5
-	la	$a2,$LC10
-	la	$t9,fprintf
-	jal	$ra,$t9
-	lw	$a0,32($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	lw	$a0,44($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	li	$a0,1			# 0x1
-	la	$t9,exit
-	jal	$ra,$t9
-$L68:
-	lw	$a0,24($fp)
-	lw	$a1,40($fp)
-	la	$t9,crearMatriz
-	jal	$ra,$t9
-	sw	$v0,48($fp)
-	sw	$zero,52($fp)
-$L69:
-	lw	$v0,52($fp)
-	lw	$v1,24($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L72
-	b	$L70
-$L72:
-	sw	$zero,56($fp)
-$L73:
-	lw	$v0,56($fp)
-	lw	$v1,40($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L76
-	b	$L71
-$L76:
-	lw	$v0,52($fp)
-	sll	$v1,$v0,2
-	lw	$v0,48($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,56($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$v0,$v1,$v0
-	sw	$zero,0($v0)
-	sw	$zero,4($v0)
-	sw	$zero,60($fp)
-$L77:
-	lw	$v0,60($fp)
-	lw	$v1,28($fp)
-	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L80
-	b	$L75
-$L80:
-	lw	$v0,52($fp)
-	sll	$v1,$v0,2
-	lw	$v0,48($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,56($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$a2,$v1,$v0
-	lw	$v0,52($fp)
-	sll	$v1,$v0,2
-	lw	$v0,48($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,56($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$a3,$v1,$v0
-	lw	$v0,52($fp)
-	sll	$v1,$v0,2
-	lw	$v0,32($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,60($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$a1,$v1,$v0
-	lw	$v0,60($fp)
-	sll	$v1,$v0,2
-	lw	$v0,44($fp)
-	addu	$a0,$v1,$v0
-	lw	$v0,56($fp)
-	sll	$v1,$v0,3
-	lw	$v0,0($a0)
-	addu	$v0,$v1,$v0
-	l.d	$f2,0($a1)
-	l.d	$f0,0($v0)
-	mul.d	$f2,$f2,$f0
-	l.d	$f0,0($a3)
-	add.d	$f0,$f0,$f2
-	s.d	$f0,0($a2)
-	lw	$v0,60($fp)
-	addu	$v0,$v0,1
-	sw	$v0,60($fp)
-	b	$L77
-$L75:
-	lw	$v0,56($fp)
-	addu	$v0,$v0,1
-	sw	$v0,56($fp)
-	b	$L73
-$L71:
-	lw	$v0,52($fp)
-	addu	$v0,$v0,1
-	sw	$v0,52($fp)
-	b	$L69
-$L70:
-	lw	$a0,48($fp)
-	lw	$a1,24($fp)
-	lw	$a2,40($fp)
-	la	$t9,imprimirMatriz
-	jal	$ra,$t9
-	lw	$a0,32($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	lw	$a0,44($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	lw	$a0,48($fp)
-	la	$t9,free
-	jal	$ra,$t9
-	b	$L65
-	.end	multiplicarMatriz
-	.size	multiplicarMatriz, .-multiplicarMatriz
-	.rdata
-	.align	2
-$LC11:
-	.ascii	"hV\000"
-	.text
-	.align	2
-	.globl	procesarArgumentos
-	.ent	procesarArgumentos
-procesarArgumentos:
-	.frame	$fp,56,$ra		# vars= 16, regs= 3/0, args= 16, extra= 8
-	.mask	0xd0000000,-8
-	.fmask	0x00000000,0
-	.set	noreorder
-	.cpload	$t9
-	.set	reorder
-	subu	$sp,$sp,56
-	.cprestore 16
-	sw	$ra,48($sp)
-	sw	$fp,44($sp)
-	sw	$gp,40($sp)
-	move	$fp,$sp
-	sw	$a0,56($fp)
-	sw	$a1,60($fp)
-	sw	$zero,24($fp)
-$L82:
-	lw	$a0,56($fp)
-	lw	$a1,60($fp)
-	la	$a2,$LC11
-	la	$t9,getopt
-	jal	$ra,$t9
-	sw	$v0,28($fp)
-	lw	$v1,28($fp)
-	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L84
-	b	$L83
-$L84:
-	lw	$v0,28($fp)
-	sw	$v0,32($fp)
-	li	$v0,86			# 0x56
-	lw	$v1,32($fp)
-	beq	$v1,$v0,$L87
-	li	$v0,104			# 0x68
-	lw	$v1,32($fp)
-	beq	$v1,$v0,$L86
-	b	$L88
-$L86:
-	li	$v0,1			# 0x1
-	sw	$v0,24($fp)
-	b	$L82
-$L87:
-	li	$v0,2			# 0x2
-	sw	$v0,24($fp)
-	b	$L82
-$L88:
-	li	$v0,4			# 0x4
-	sw	$v0,24($fp)
-	b	$L82
-$L83:
-	lw	$v0,24($fp)
-	bne	$v0,$zero,$L90
-	li	$v0,3			# 0x3
-	sw	$v0,24($fp)
-$L90:
-	lw	$v0,24($fp)
-	move	$sp,$fp
-	lw	$ra,48($sp)
-	lw	$fp,44($sp)
-	addu	$sp,$sp,56
-	j	$ra
-	.end	procesarArgumentos
-	.size	procesarArgumentos, .-procesarArgumentos
-	.ident	"GCC: (GNU) 3.3.3 (NetBSD nb3 20040520)"
+#include <mips/regdef.h>
+
+
+                # a0 cant filas A
+                # a1 puntero a matriz B
+                # a2 puntero a matriz C
+                # a3 puntero a matriz A
+
+                .text
+                .globl  multiplicarMatrices
+                .ent multiplicarMatrices
+
+multiplicarMatrices:
+        move t0, a0 # lw t0, cantf_c_i
+        lw t1, 16(sp)# lw t1, cantc_c_j
+        lw t2, 20(sp) # lw t2, cantc_a_k
+
+
+
+        #no hago una estiqueta para i porque nunca volveremos a hacer i =0 para
+        #Las filas
+        li s0, 0 # i = 0; initialize 1st for loop
+loop1:
+        # Al contrario para las columnas de B se hace una corrida por cada fila
+        #Varias veces a este punto
+        li s1, 0 # j = 0; restart 2nd for loop
+loop2:
+        # Por cada valor de C deberemos iterar sobre todos los valores de K
+        #
+        li s2, 0 # k = 0; restart 3rd for loop
+
+#Operaciones con C
+        mul t3, s0, t1  # en t3 la cantidad de columnas de c
+        addu t3, t3, s1 # en t3 sumo el valor de j-> la posicion en el array
+        sll t3, t3, 3 #  el offset en bytes en el array
+        addu t3, a2, t3 # cargo en t3 la direccion de C{i}{j}
+        sw zero, 0(t3) # inicializo C{i}{j} con cero
+	l.d $f4, 0(t3)
+        #add t4, zero, zero # inicializo en t4 en cero que será el valor de C{i}
+		
+
+#Operaciones con A
+loop3:
+        mul t7, s0, t2  # en t7 la cantidad de columnas de A "K"
+        addu t7, t7, s2 #  ahora le sumamos K y obtenemos la posicion en el arra
+        sll t7, t7, 3 #  multiplcamos por 4 y obtenemos el offset de A[i][k]
+        addu t7, a3, t7 # obtenemos la direccion de A[i][k]
+        l.d $f8, 0(t7) # guardamos en t8 el valor de A[i][k]
+        
+# Ahora con B
+
+        mul t5, s2, t1 # t5 = k * 4 (size of row of b)
+        addu t5, t5, s1 # t5 = k * size(row) + j
+        sll t5, t5, 3 # t5 = byte offset off [k][j]
+        addu t5, a1, t5 # t5 = byte address of b[k][j]
+        l.d $f6, 0(t5)
+
+
+
+mul.d $f6, $f8, $f6 # t6 = a[i][k] * b[k][j]
+add.d $f4, $f4, $f6 # t4 = c[i][j] + a[i][k] * b[k][j]
+
+
+s.d $f4, 0(t3) # c[i][j] = t4  guardo el valor calculado en c[i][j]
+
+addiu s2, s2, 1 # k = k + 1
+bne s2, t2, loop3 #if (k != 4) go to loop3
+
+addiu s1, s1, 1 # j = j + 1
+bne s1, t1, loop2 # if (j != 4) go to loop2
+
+addiu s0, s0, 1 # i = i + 1
+bne s0, t0, loop1 # if (i != 32) go to loop1
+
+jalr ra
+
+.end multiplicarMatrices
 \end{lstlisting}
 \pagebreak
 
