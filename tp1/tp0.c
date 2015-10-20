@@ -17,7 +17,6 @@ enum ACCION {
 	ERROR
 };
 
-//void muliplicarMatrices(int filasA, int* matrizB, int* resultado, int* matrizA, int columnasB, int columnasA);
 void multiplicarMatriz();
 enum ACCION procesarArgumentos(int argc, char** argv);
 
@@ -85,7 +84,7 @@ void leerDimension(int* filas, int* columnas) {
 	int i = 0, total = 0;
 	while((newChar = getchar()) != EOF) {
 		c = (char) newChar;
-		//printf("c leído: %s\n", &c);
+
 		if (c == 'x') {
 			*filas = atoi(buffer);
 			memset(buffer,0,strlen(buffer));
@@ -108,7 +107,6 @@ void leerDimension(int* filas, int* columnas) {
 			}
 		} else {			
 			buffer[i] = c;
-			//buffer[i]=strdup(&c);
 		}
 		i++;
 		total++;
@@ -180,31 +178,15 @@ void leerMatriz(double* matriz, int filas, int columnas) {
 		exit(EXIT_ERROR);
 	}
 	
-
 	if (newChar == EOF)
 		exit(EXIT_OK);
 }
-double* crearMatriz(int filas, int columnas) {
-/*
-double** crearMatriz(int filas, int columnas) {
-	double** matriz = (double**) malloc(sizeof(double*) * filas);
-	if (matriz == NULL) {
-		fprintf(stderr, "%s\n", "Memoria insuficiente.");
-		exit(EXIT_ERROR);
-	}
-	int i;
-	for(i = 0; i < filas; ++i)
-		matriz[i] = (double*) malloc(sizeof(double) * columnas);
 
-	if (matriz[i - 1] == NULL) {
-		fprintf(stderr, "%s\n", "Memoria insuficiente.");
-		exit(EXIT_ERROR);
-	}*/
+
+double* crearMatriz(int filas, int columnas) {
 	double* matriz = (double*) malloc(sizeof(double) * filas * columnas);
 	return matriz;
 }
-
-
 
 
 void multiplicarMatriz() {
@@ -229,11 +211,9 @@ void multiplicarMatriz() {
 
 		double* matrizC = crearMatriz(filasA, columnasB);
 		
-		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, 
-		 columnasB, columnasA);
-		 
-
-		imprimirMatriz(matrizC, filasA, columnasB); // TODO cambiar esto por un método que imprima pensando en array
+		multiplicarMatrices(filasA, matrizB, matrizC, matrizA, columnasB, columnasA);
+		
+		imprimirMatriz(matrizC, filasA, columnasB);
 
 		free(matrizA);
 		free(matrizB);
