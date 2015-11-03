@@ -11,11 +11,22 @@
                 .ent multiplicarMatrices
 
 multiplicarMatrices:
+
+		  
+
         move t0, a0 # lw t0, cantf_c_i
         lw t1, 16(sp)# lw t1, cantc_c_j
         lw t2, 20(sp) # lw t2, cantc_a_k
 
-
+		  
+		 
+		  
+		  addi sp, sp, -4
+		  sw   $fp, 0(sp)
+		  move $fp, sp
+		  addi sp, sp, -12
+		   sw   ra, 8(sp)
+		  sw   sp,  12(sp)
 
         #no hago una estiqueta para i porque nunca volveremos a hacer i =0 para
         #Las filas
@@ -71,6 +82,9 @@ bne s1, t1, loop2 # if (j != 4) go to loop2
 
 addiu s0, s0, 1 # i = i + 1
 bne s0, t0, loop1 # if (i != 32) go to loop1
+
+#restauro el sp
+lw   sp,  12(sp)
 
 jalr ra
 
