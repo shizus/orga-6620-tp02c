@@ -1,5 +1,6 @@
+
 #
-# Aplicacion que implementa la funcion heapsort.
+# Aplicacion que implementa la funcion multiplicar.
 #
 #
 ###############
@@ -59,7 +60,7 @@ multiplicarMatrices:
         subu    sp, sp, 16      # creo stack frame
         sw      $fp, 0(sp)      # guardo valor de fp
         sw      gp, 4(sp)       # guardo valor de gp
-        sw      ra, 8(sp)      # guardo valor de ra
+        sw      ra, 8(sp)       # guardo valor de ra
         move    $fp, sp
 
         sw      a0, 16(sp)      # cargo parametro int filasA
