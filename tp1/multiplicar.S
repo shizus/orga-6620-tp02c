@@ -7,15 +7,15 @@
 # Stack frame #
 ###############
 #
-# 16 ------------
+#  ------------ 16
 #       xxx
-# 12 ------------
+#  ------------ 12
 #       ra
-# 8 -------------
+#  ------------- 8
 #       gp
-# 4 -------------
+#  ------------- 4
 #       fp
-# 0 -------------
+#  ------------- 0
 #
 ################################
 # Detalle de registros usados: #
@@ -71,9 +71,9 @@ multiplicarMatrices:
         # directiva para codigo PIC
         .cprestore 4            # inserta aqui "sw gp, 4(sp)", mas "lw gp, 4(sp)" luego de cada jal.
 
-        move t0, a0             # lw t0, cantf_c_i
-        lw t1, 16(sp)           # lw t1, cantc_c_j
-        lw t2, 20(sp)           # lw t2, cantc_a_k
+        addiu t0, a0, 0         # lw t0, cantf_c_i
+        lw t1, 32(sp)           # lw t1, cantc_c_j
+        lw t2, 36(sp)           # lw t2, cantc_a_k
 # -----------------------------------------------------------------------------
         #no hago una estiqueta para i porque nunca volveremos a hacer i =0 para
         #Las filas
