@@ -16,7 +16,7 @@ touch tmp_out
 touch tmp_error
 for t in ${!TEST[*]}
 do
-	./tp0 <$TESTDIR/${TEST[t]} >tmp_out 2>tmp_error
+	./tp1 <$TESTDIR/${TEST[t]} >tmp_out 2>tmp_error
     DIFF=$(diff -q "$TESTDIR/${TEST[t]}_out" "tmp_out")
     DIFF_ERROR=$(diff -q "$TESTDIR/${TEST[t]}_error" "tmp_error")
 	if [ -z "$DIFF" ] && [ -z "$DIFF_ERROR" ]; then
