@@ -228,7 +228,7 @@ char* append(char* original, int originalSize, char* toAppend) {
 	}
 	original = (char *) realloc(original, (originalSize + 1) * sizeof(char));
 	if (original == NULL) {
-		fprintf(stderr, " No hay más memoria.\n");
+		fprintf(stderr, " No hay m\'as memoria.\n");
 		return NULL;
 	}
 	original[originalSize] = *toAppend;
@@ -267,7 +267,7 @@ void leerDimension(int* filas, int* columnas) {
 			buffer = append(buffer, total,&c);
 			if (buffer == NULL) {
 				free(oldBuffer);
-				fprintf(stderr, " No hay más memoria.\n");
+				fprintf(stderr, " No hay m\'as memoria.\n");
 				exit(EXIT_ERROR);
 			}
 		} else {			
@@ -333,7 +333,7 @@ void leerMatriz(double* matriz, int filas, int columnas) {
 			buffer = append(buffer, total, &c);
 			if (buffer == NULL) {
 				free(oldBuffer);
-				fprintf(stderr, "%s\n", "No hay más memoria para guardar la matriz.");
+				fprintf(stderr, "%s\n", "No hay m\'as memoria para guardar la matriz.");
 			}
 			exit(EXIT_ERROR);
 		}
@@ -506,6 +506,11 @@ multiplicarMatrices:
         sw      ra, 8(sp)       # guardo valor de ra
         move    $fp, sp
 
+        sw      a0, 16(sp)      # cargo parametro int filasA
+        sw      a1, 20(sp)      # cargo parametro double* matrizB
+        sw      a2, 24(sp)      # cargo parametro double* matrizC
+        sw      a3, 28(sp)      # cargo parametro double* matrizA
+
 
         # directiva para c\'odigo PIC
         .cprestore 4            # inserta aqui "sw gp, 4(sp)", mas "lw gp, 4(sp)" luego de cada jal.
@@ -533,7 +538,7 @@ loop2:
         addu    t3, a2, t3      # cargo en t3 la direccion de C{i}{j}
         sw      zero, 0(t3)     # inicializo C{i}{j} con cero
 	l.d     $f4, 0(t3)
-        #add t4, zero, zero # inicializo en t4 en cero que será el valor de C{i}
+        #add t4, zero, zero # inicializo en t4 en cero que ser\'a el valor de C{i}
 		
 #Operaciones con A
 loop3:
@@ -581,8 +586,177 @@ Una vez que tenemos el stack en su nueva posici\'on, procedemos a guardar los va
 Posteriormente, hay que notar que al levantar los par\'ametros que no entraron en a0, a1, a2 y a3. Estos se hayan a partir, por convenci\'on, a partir de la posici\'on 16 relativamente al valor con el que recibimos el sp, en este caso, como descendimos 16 bytes, debemos ir a buscar el valor del quinto par\'ametro en la posici\'on 32 y el sexto en la posici\'on 36.
 Luego, el c\'odigo se ejecuta normalmente, en base a los valores recibidos y posteriormente, antes de salir de la rutina, se restauran los valores que se hab\'ian guardado en el stack. Dejando el fp, ra y el gp con los valores con los que los recibimos, para que el programa que nos llam\'o pueda continuar normalmente su ejecuci\'on.
 
+\section{C\'odigo generado por el compilador para multiplicar.c}
+\begin{lstlisting}
+        .file   1 "multiplicar.c"
+        .section .mdebug.abi32
+        .previous
+        .abicalls
+        .text
+        .align  2
+        .globl  multiplicarMatrices
+        .ent    multiplicarMatrices
+multiplicarMatrices:
+        .frame  $fp,32,$ra              # vars= 16, regs= 2/0, args= 0, extra= 8
+        .mask   0x50000000,-4
+        .fmask  0x00000000,0
+        .set    noreorder
+        .cpload $t9
+        .set    reorder
+        subu    $sp,$sp,32
+        .cprestore 0
+        sw      $fp,28($sp)
+        sw      $gp,24($sp)
+        move    $fp,$sp
+        sw      $a0,32($fp)
+        sw      $a1,36($fp)
+        sw      $a2,40($fp)
+        sw      $a3,44($fp)
+        sw      $zero,8($fp)
+$L2:
+        lw      $v0,8($fp)
+        lw      $v1,32($fp)
+        slt     $v0,$v0,$v1
+        bne     $v0,$zero,$L5
+        b       $L1
+$L5:
+        sw      $zero,12($fp)
+$L6:
+        lw      $v0,12($fp)
+        lw      $v1,48($fp)
+        slt     $v0,$v0,$v1
+        bne     $v0,$zero,$L9
+        b       $L4
+$L9:
+        lw      $v1,8($fp)
+        lw      $v0,48($fp)
+        mult    $v1,$v0
+        mflo    $v1
+        lw      $v0,12($fp)
+        addu    $v0,$v1,$v0
+        sll     $v1,$v0,3
+        lw      $v0,40($fp)
+        addu    $v0,$v1,$v0
+        sw      $zero,0($v0)
+        sw      $zero,4($v0)
+        sw      $zero,16($fp)
+$L10:
+        lw      $v0,16($fp)
+        lw      $v1,52($fp)
+        slt     $v0,$v0,$v1
+        bne     $v0,$zero,$L13
+        b       $L8
+$L13:
+        lw      $v1,8($fp)
+        lw      $v0,48($fp)
+        mult    $v1,$v0
+        mflo    $v1
+        lw      $v0,12($fp)
+        addu    $v0,$v1,$v0
+        sll     $v1,$v0,3
+        lw      $v0,40($fp)
+        addu    $a1,$v1,$v0
+        lw      $v1,8($fp)
+        lw      $v0,48($fp)
+        mult    $v1,$v0
+        mflo    $v1
+        lw      $v0,12($fp)
+        addu    $v0,$v1,$v0
+        sll     $v1,$v0,3
+        lw      $v0,40($fp)
+        addu    $a2,$v1,$v0
+        lw      $v1,8($fp)
+        lw      $v0,52($fp)
+        mult    $v1,$v0
+        mflo    $v1
+        lw      $v0,16($fp)
+        addu    $v0,$v1,$v0
+        sll     $v1,$v0,3
+        lw      $v0,44($fp)
+        addu    $a0,$v1,$v0
+        lw      $v1,16($fp)
+        lw      $v0,48($fp)
+        mult    $v1,$v0
+        mflo    $v1
+        lw      $v0,12($fp)
+        addu    $v0,$v1,$v0
+        sll     $v1,$v0,3
+        lw      $v0,36($fp)
+        addu    $v0,$v1,$v0
+        l.d     $f2,0($a0)
+        l.d     $f0,0($v0)
+        mul.d   $f2,$f2,$f0
+        l.d     $f0,0($a2)
+        add.d   $f0,$f0,$f2
+        s.d     $f0,0($a1)
+        lw      $v0,16($fp)
+        addu    $v0,$v0,1
+        sw      $v0,16($fp)
+        b       $L10
+$L8:
+        lw      $v0,12($fp)
+        addu    $v0,$v0,1
+        sw      $v0,12($fp)
+        b       $L6
+$L4:
+        lw      $v0,8($fp)
+        addu    $v0,$v0,1
+        sw      $v0,8($fp)
+        b       $L2
+$L1:
+        move    $sp,$fp
+        lw      $fp,28($sp)
+        addu    $sp,$sp,32
+        j       $ra
+        .end    multiplicarMatrices
+        .size   multiplicarMatrices, .-multiplicarMatrices
+        .ident  "GCC: (GNU) 3.3.3 (NetBSD nb3 20040520)"
+\end{lstlisting}
 \section{Conclusiones}
-*** HACER
-Completar conclusiones del c\'odigo Assembly generado por el compilador vs. el c\'odigo que nosotros generamos
+Lo primero a destacar es que para genera el c\'odigo en assembler con el compilador utilizamos el par\'ametro -O0 que implica que el compilador no realice ninguna optimizaci\'on sobre el c\'odigo. Esto, generalmente, lo hace m\'as legible pero menos eficiente.
+Vemos que, como la nuestra es una funci\'on leaf, tomamos el m\'inimo indispensable de stack, mientras que el compilador, toma 32 bytes de stack.
+Nuestro c\'odigo, de aproximadamente, 83 l\'ineas sin contar los comentarios, result\'o m\'as corto y un poco m\'as legible que el de la m\'aquina que no utiliza nombres representativos y ocupa 123 l\'ineas.
+En cuanto a la implementaci\'on de la multiplicaci\'on en si, resulta bastante similar, aunque hace mucho uso del fp, en lugar de usar variables temporales, que es lo que nosotros preferimos hacer.
+
+Si medimos los tiempos de ejecuci\'on:
+
+Primero tenemos el c\'odigo assembly generado por la m\'aquina
+
+\begin{lstlisting}[language=bash]
+	root@:/home/gxemul# gcc -Wall -O0 multiplicar.c tp1.c -o tp1
+	root@:/home/gxemul# time ./tests.sh 
+		Tests #0 success_normal:        OK
+		Tests #1 success_espacios:      OK
+		Tests #2 error_dimension:       OK
+		Tests #3 error_dimension_caracter_invalido:     OK
+		Tests #4 error_dimension_cero:  OK
+		Tests #5 error_matriz1:         OK
+		Tests #6 error_matriz2:         OK
+
+	real    0m0.781s
+	user    0m0.354s
+	sys     0m0.470s
+\end{lstlisting}
+
+Despu\'es el nuestro
+
+\begin{lstlisting}[language=bash]
+	root@:/home/gxemul# gcc -Wall -O0 multiplicar.S tp1.c -o tp1
+	root@:/home/gxemul# time ./tests.sh 
+        Tests #0 success_normal:        OK
+        Tests #1 success_espacios:      OK
+        Tests #2 error_dimension:       OK
+        Tests #3 error_dimension_caracter_invalido:     OK
+        Tests #4 error_dimension_cero:  OK
+        Tests #5 error_matriz1:         OK
+        Tests #6 error_matriz2:         OK
+
+	real    0m0.766s
+	user    0m0.327s
+	sys     0m0.458s
+
+\end{lstlisting}
+
+El script tests.sh corre 6 veces nuestro programa tp1 y compara la salida con salidas que tenemos guardadas, que son las esperadas en cada caso. Esto es una medida estimativa, lo ideal ser\'ia correrlo muchas veces para medir mejor los tiempos, pero se puede apreciar como en este caso, nuestro c\'ogio corri\'o m\'as r\'apido que el generado por la m\'aquina. Esto seguramente, se debe a la falta de optimizaci\'on por parte del compilador al interpretar el multiplicar.c
 
 \end{document}

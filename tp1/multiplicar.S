@@ -63,6 +63,11 @@ multiplicarMatrices:
         sw      ra, 8(sp)       # guardo valor de ra
         move    $fp, sp
 
+        sw      a0, 16(sp)      # cargo parametro int filasA
+        sw      a1, 20(sp)      # cargo parametro double* matrizB
+        sw      a2, 24(sp)      # cargo parametro double* matrizC
+        sw      a3, 28(sp)      # cargo parametro double* matrizA
+
         # directiva para codigo PIC
         .cprestore 4            # inserta aqui "sw gp, 4(sp)", mas "lw gp, 4(sp)" luego de cada jal.
 
