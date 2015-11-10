@@ -495,9 +495,9 @@ multiplicarMatrices:
         # debugging info: descripcion del stack frame
         .frame  $fp, 16, ra    # $fp: frame pointer, 16: tamanio stack frame, ra: return address
         
-        # bloque para codigo PIC
+        # bloque para c\'odigo PIC
         .set    noreorder       # apaga reordenamiento de instrucciones
-        .cpload t9              # directiva usada para codigo PIC
+        .cpload t9              # directiva usada para c\'odigo PIC
         .set    reorder         # enciende reordenamiento de instrucciones
 
         subu    sp, sp, 16      # creo stack frame
@@ -507,7 +507,7 @@ multiplicarMatrices:
         move    $fp, sp
 
 
-        # directiva para codigo PIC
+        # directiva para c\'odigo PIC
         .cprestore 4            # inserta aqui "sw gp, 4(sp)", mas "lw gp, 4(sp)" luego de cada jal.
 
         addiu   t0, a0, 0         # lw t0, cantf_c_i
@@ -574,9 +574,14 @@ loop3:
         .end multiplicarMatrices
 \end{lstlisting}
 \pagebreak
+\section{Explicaci\'on del Stack}
+
+Lo primero que hacemos es restarle 16 al stack pointer. Puesto que queremos guardar el ra (return address), el gp (global pointer) y el fp (frame pointer), estos tres valores nos ocupar\'an 4 bytes cada una, o sea que necesitar\'iamos 12 bytes posiciones, pero por convenci\'on, el m\'inimo que debe ocupar el stack es 16 bytes. Por eso restamos 16 bytes al valor del stack pointer y no 12.
+Una vez que tenemos el stack en su nueva posici\'on, procedemos a guardar los valores del fp, gp y ra en las posiciones relativas al sp, 0, 4 y 8, respectivamente. Luego cargamos en el frame pointer el valor actual del stack pointer para que apunten a la misma direcci\'on de memoria.
+Posteriormente, hay que notar que al levantar los par\'ametros que no entraron en a0, a1, a2 y a3. Estos se hayan a partir, por convenci\'on, a partir de la posici\'on 16 relativamente al valor con el que recibimos el sp, en este caso, como descendimos 16 bytes, debemos ir a buscar el valor del quinto par\'ametro en la posici\'on 32 y el sexto en la posici\'on 36.
 
 \section{Conclusiones}
 *** HACER
-Completar conclusiones del codigo Assembly generado por el compilador vs. el codigo que nosotros generamos
+Completar conclusiones del c\'odigo Assembly generado por el compilador vs. el c\'odigo que nosotros generamos
 
 \end{document}
